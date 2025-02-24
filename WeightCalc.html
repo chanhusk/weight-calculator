@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Bitch Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .calculator {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input {
+            padding: 8px;
+            width: 200px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .maintenance {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Big Bitch Calculator</h2>
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <select id="age"></select>
+        </div>
+        <div class="form-group">
+            <label for="weight">Weight (lbs):</label>
+            <input type="number" id="weight" min="50" max="500">
+        </div>
+        <div class="form-group">
+            <label for="heightFeet">Height:</label>
+            <select id="heightFeet"></select> ft 
+            <select id="heightInches"></select> in
+        </div>
+        <div class="form-group">
+            <label for="activity">Activity Level:</label>
+            <select id="activity">
+                <option value="1.2">Sedentary (little to no exercise)</option>
+                <option value="1.375">Light (exercise 1-3 days/week)</option>
+                <option value="1.55">Moderate (exercise 3-5 days/week)</option>
+                <option value="1.725">Active (exercise 6-7 days/week)</option>
+                <option value="1.9">Very Active (intense exercise daily)</option>
+            </select>
+        </div>
+        <button onclick="calculate()">Calculate</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Populate age dropdown (18-80)
+        const ageSelect = document.getElementById('age');
+        for (let i = 18; i <= 80; i++) {
+            ageSelect.options.add(new Option(i, i));
+        }
+
+        // Populate height feet (4-7)
+        const heightFeetSelect = document.getElementById('heightFeet');
+        for (let i = 4; i <= 7; i++) {
+            heightFeetSelect.options.add(new Option(i, i));
+        }
+
+        // Populate height inches (0-11)
+        const heightInchesSelect = document.getElementById('heightInches');
+        for (let i = 0; i <= 11; i++) {
+            heightInchesSelect.options.add(new Option(i, i));
+        }
+
+        function calculate() {
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const heightFeet = parseInt(document.getElementById('heightFeet').value);
+            const heightInches = parseInt(document.getElementById('heightInches').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+
+            // Validate inputs
+            if (!weight || weight < 50 || weight > 500) {
+                alert('Please enter a valid weight between 50 and 500 lbs');
+                return;
+            }
+
+            // Convert height to inches
+            const height = (heightFeet * 12) + heightInches;
+            // Convert weight to kg
+            const weightKg = weight * 0.453592;
+
+            // Calculate BMR (using Mifflin-St Jeor Equation for men as a general estimate)
+            const bmr = 10 * weightKg + 6.25 * height * 2.54 - 5 * age + 5;
+            // Calculate TDEE (Total Daily Energy Expenditure)
+            const maintenance = Math.round(bmr * activity);
+
+            // Calculate deficits
+            const deficits = [
+                { deficit: 250, label: 'Mild (0.5 lb/week)' },
+                { deficit: 500, label: 'Moderate (1 lb/week)' },
+                { deficit: 750, label: 'Aggressive (1.5 lb/week)' },
+                { deficit: 1000, label: 'Very Aggressive (2 lb/week)' }
+            ];
+
+            // Generate results
+            let html = `
+                <div class="maintenance">
+                    <strong>Your Maintenance calories to stay a Big Bitch: ${maintenance} kcal/day</strong><br>
+                    (Calories needed to maintain Big Bitch status)
+                </div>
+                <h3>Weight Loss Options</h3>
+                <table>
+                    <tr>
+                        <th>Calorie Deficit</th>
+                        <th>Daily Calories</th>
+                        <th>Weight Loss Rate</th>
+                    </tr>
+            `;
+
+            deficits.forEach(d => {
+                const calories = maintenance - d.deficit;
+                html += `
+                    <tr>
+                        <td>${d.deficit} kcal</td>
+                        <td>${calories} kcal</td>
+                        <td>${d.label}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</table>';
+            document.getElementById('results').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
