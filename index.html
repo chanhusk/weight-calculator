@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --secondary: #2980b9;
+            --gradient: linear-gradient(135deg, #8e44ad, #2980b9);
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --shadow: 0 6px 18px rgba(0,0,0,0.1);
+            --border: #dfe6e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f7f9fc;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+
+        .calculator {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--gradient);
+            padding: 25px 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 3px solid rgba(255,255,255,0.1);
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 25px;
+            display: grid;
+            gap: 15px;
+            background: #fff;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--dark);
+            font-size: 1em;
+        }
+
+        select, input {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            background: white;
+            cursor: pointer;
+        }
+
+        select:hover, input:hover {
+            border-color: #b2bec3;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
+        }
+
+        .height-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .diet-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .diet-card {
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .diet-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(142, 68, 173, 0.15);
+            border-color: var(--primary);
+        }
+
+        .diet-card.selected {
+            border-color: var(--primary);
+            background: rgba(142, 68, 173, 0.05);
+        }
+
+        .diet-card i, .diet-card svg {
+            font-size: 1.6em;
+            margin-bottom: 10px;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            width: 1.6em; /* Match FontAwesome size */
+            height: 1.6em;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .diet-card:hover i, .diet-card:hover svg {
+            transform: scale(1.1);
+        }
+
+        .diet-name {
+            font-weight: 500;
+            font-size: 1em;
+        }
+
+        button {
+            background: var(--gradient);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 3px 9px rgba(142, 68, 173, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(142, 68, 173, 0.4);
+        }
+
+        #results {
+            padding: 25px;
+            display: none;
+            background: #f8fafd;
+            border-top: 1px solid var(--border);
+        }
+
+        .results-card {
+            background: var(--gradient);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(142, 68, 173, 0.2);
+        }
+
+        .results-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+            font-weight: 500;
+        }
+
+        .calorie-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .section {
+            margin: 25px 0;
+        }
+
+        .section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            font-weight: 500;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h3::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 1px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #f0f4f8;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 1em;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafd;
+        }
+
+        tr:hover {
+            background: #e9f1f9;
+        }
+
+        .meal-suggestions {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .meal-item {
+            margin: 10px 0;
+            padding: 12px;
+            background: #f8fafd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .meal-item:hover {
+            transform: translateX(3px);
+            background: #e9f1f9;
+        }
+
+        .meal-item strong {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .form-container { padding: 20px; }
+            .diet-options { grid-template-columns: repeat(2, 1fr); }
+            .header { padding: 20px 15px; }
+            #results { padding: 20px; }
+            .calorie-value { font-size: 2em; }
+            .calculator { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <h1>Nutrition Calculator</h1>
+            <p>Your personalized calorie and diet planner</p>
+        </div>
+        <div class="form-container">
+            <div class="form-group">
+                <label for="age"><i class="fas fa-calendar-alt"></i> Age</label>
+                <select id="age"></select>
+            </div>
+            <div class="form-group">
+                <label for="weight"><i class="fas fa-weight-scale"></i> Weight (lbs)</label>
+                <input type="number" id="weight" min="50" max="500" placeholder="Enter your weight">
+            </div>
+            <div class="form-group">
+                <label for="heightFeet"><i class="fas fa-ruler-vertical"></i> Height</label>
+                <div class="height-group">
+                    <select id="heightFeet"></select>
+                    <select id="heightInches"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="activity"><i class="fas fa-person-running"></i> Activity Level</label>
+                <select id="activity">
+                    <option value="1.2">Sedentary (little to no exercise)</option>
+                    <option value="1.375">Light (1-3 days/week)</option>
+                    <option value="1.55">Moderate (3-5 days/week)</option>
+                    <option value="1.725">Active (6-7 days/week)</option>
+                    <option value="1.9">Very Active (daily intense)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-utensils"></i> Select Your Diet</label>
+                <div class="diet-options">
+                    <div class="diet-card" data-diet="mediterranean" onclick="selectDiet('mediterranean', this)">
+                        <i class="fas fa-fish"></i>
+                        <div class="diet-name">Mediterranean</div>
+                    </div>
+                    <div class="diet-card" data-diet="paleo" onclick="selectDiet('paleo', this)">
+                        <i class="fas fa-drumstick-bite"></i>
+                        <div class="diet-name">Paleo</div>
+                    </div>
+                    <div class="diet-card" data-diet="carnivore" onclick="selectDiet('carnivore', this)">
+                        <!-- Inline SVG for bull head -->
+                        <svg viewBox="0 0 24 24" fill="var(--primary)">
+                            <path d="M20 4h-2.5c-.28 0-.5-.22-.5-.5s-.22-.5-.5-.5H15c-.28 0-.5.22-.5.5s-.22.5-.5.5H11c-.28 0-.5-.22-.5-.5s-.22-.5-.5-.5H7c-.28 0-.5.22-.5.5s-.22.5-.5.5H3c-.55 0-1 .45-1 1v2c0 2.76 2.24 5 5 5h1v7c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-7h1c2.76 0 5-2.24 5-5V5c0-.55-.45-1-1-1zM7 11c-1.66 0-3-1.34-3-3V6h1.5c.28 0 .5-.22.5-.5s.22-.5.5-.5h2c.28 0 .5.22.5.5s.22.5.5.5H11v2c0 1.66-1.34 3-3 3H7zm10 0c-1.66 0-3-1.34-3-3V6h1.5c.28 0 .5-.22.5-.5s.22-.5.5-.5h2c.28 0 .5.22.5.5s.22.5.5.5H19v2c0 1.66-1.34 3-3 3h-1z"/>
+                        </svg>
+                        <div class="diet-name">Carnivore</div>
+                    </div>
+                    <div class="diet-card" data-diet="keto" onclick="selectDiet('keto', this)">
+                        <i class="fas fa-bacon"></i>
+                        <div class="diet-name">Keto</div>
+                    </div>
+                    <div class="diet-card" data-diet="vegan" onclick="selectDiet('vegan', this)">
+                        <i class="fas fa-leaf"></i>
+                        <div class="diet-name">Vegan</div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="calculate()"><i class="fas fa-calculator"></i> Calculate Now</button>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const ageSelect = document.getElementById('age');
+        ageSelect.innerHTML = '<option value="" disabled selected>Select age</option>';
+        for (let i = 18; i <= 80; i++) {
+            ageSelect.innerHTML += `<option value="${i}">${i} years</option>`;
+        }
+
+        const heightFeetSelect = document.getElementById('heightFeet');
+        heightFeetSelect.innerHTML = '<option value="" disabled selected>Feet</option>';
+        for (let i = 4; i <= 7; i++) {
+            heightFeetSelect.innerHTML += `<option value="${i}">${i} ft</option>`;
+        }
+
+        const heightInchesSelect = document.getElementById('heightInches');
+        heightInchesSelect.innerHTML = '<option value="" disabled selected>Inches</option>';
+        for (let i = 0; i <= 11; i++) {
+            heightInchesSelect.innerHTML += `<option value="${i}">${i} in</option>`;
+        }
+
+        let selectedDiet = 'mediterranean';
+        function selectDiet(diet, element) {
+            document.querySelectorAll('.diet-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedDiet = diet;
+        }
+        document.querySelector('.diet-card[data-diet="mediterranean"]').classList.add('selected');
+
+        function calculate() {
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const heightFeet = parseInt(document.getElementById('heightFeet').value);
+            const heightInches = parseInt(document.getElementById('heightInches').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+
+            if (!age || !weight || !heightFeet || !heightInches) {
+                alert('Please fill in all fields');
+                return;
+            }
+            if (weight < 50 || weight > 500) {
+                alert('Weight must be between 50 and 500 lbs');
+                return;
+            }
+
+            const height = (heightFeet * 12) + heightInches;
+            const weightKg = weight * 0.453592;
+            const bmr = 10 * weightKg + 6.25 * height * 2.54 - 5 * age + 5;
+            const maintenance = Math.round(bmr * activity);
+
+            const deficits = [
+                { deficit: 250, label: 'Mild (0.5 lb/week)' },
+                { deficit: 500, label: 'Moderate (1 lb/week)' },
+                { deficit: 750, label: 'Aggressive (1.5 lb/week)' },
+                { deficit: 1000, label: 'Very Aggressive (2 lb/week)' }
+            ];
+
+            let mealSuggestions = '';
+            switch(selectedDiet) {
+                case 'mediterranean':
+                    mealSuggestions = `
+                        <div class="meal-item"><strong>Breakfast:</strong> Greek yogurt with honey and walnuts</div>
+                        <div class="meal-item"><strong>Snack:</strong> Hummus with cucumber slices</div>
+                        <div class="meal-item"><strong>Lunch:</strong> Grilled salmon with quinoa salad</div>
+                        <div class="meal-item"><strong>Snack:</strong> Almonds and dried figs</div>
+                        <div class="meal-item"><strong>Dinner:</strong> Chicken souvlaki with tzatziki</div>
+                        <div class="meal-item"><strong>Side:</strong> Roasted Mediterranean veggies</div>
+                        <div class="meal-item"><strong>Breakfast 2:</strong> Feta and spinach omelette</div>
+                        <div class="meal-item"><strong>Lunch 2:</strong> Tuna and olive salad</div>
+                        <div class="meal-item"><strong>Dinner 2:</strong> Grilled lamb with rosemary</div>
+                        <div class="meal-item"><strong>Snack 2:</strong> Fresh berries with yogurt</div>
+                        <div class="meal-item"><strong>Side 2:</strong> Lentil soup</div>
+                        <div class="meal-item"><strong>Breakfast 3:</strong> Whole grain toast with avocado</div>
+                        <div class="meal-item"><strong>Lunch 3:</strong> Shrimp with garlic and herbs</div>
+                        <div class="meal-item"><strong>Dinner 3:</strong> Baked cod with tomatoes</div>
+                        <div class="meal-item"><strong>Snack 3:</strong> Olive tapenade with veggies</div>
+                    `;
+                    break;
+                case 'paleo':
+                    mealSuggestions = `
+                        <div class="meal-item"><strong>Breakfast:</strong> Scrambled eggs with bacon</div>
+                        <div class="meal-item"><strong>Snack:</strong> Apple with almond butter</div>
+                        <div class="meal-item"><strong>Lunch:</strong> Grilled chicken with sweet potato</div>
+                        <div class="meal-item"><strong>Snack:</strong> Beef jerky</div>
+                        <div class="meal-item"><strong>Dinner:</strong> Beef steak with roasted veggies</div>
+                        <div class="meal-item"><strong>Side:</strong> Sautéed kale with garlic</div>
+                        <div class="meal-item"><strong>Breakfast 2:</strong> Sausage and veggie scramble</div>
+                        <div class="meal-item"><strong>Lunch 2:</strong> Pork chops with applesauce</div>
+                        <div class="meal-item"><strong>Dinner 2:</strong> Bison burger with guacamole</div>
+                        <div class="meal-item"><strong>Snack 2:</strong> Mixed nuts</div>
+                        <div class="meal-item"><strong>Side 2:</strong> Roasted Brussels sprouts</div>
+                        <div class="meal-item"><strong>Breakfast 3:</strong> Coconut milk smoothie with berries</div>
+                        <div class="meal-item"><strong>Lunch 3:</strong> Turkey meatballs with zucchini</div>
+                        <div class="meal-item"><strong>Dinner 3:</strong> Salmon with asparagus</div>
+                        <div class="meal-item"><strong>Snack 3:</strong> Hard-boiled eggs</div>
+                    `;
+                    break;
+                case 'carnivore':
+                    mealSuggestions = `
+                        <div class="meal-item"><strong>Breakfast:</strong> Bacon and eggs</div>
+                        <div class="meal-item"><strong>Snack:</strong> Pork rinds</div>
+                        <div class="meal-item"><strong>Lunch:</strong> Ribeye steak</div>
+                        <div class="meal-item"><strong>Snack:</strong> Beef sticks</div>
+                        <div class="meal-item"><strong>Dinner:</strong> Pork chops with butter</div>
+                        <div class="meal-item"><strong>Side:</strong> Bone broth</div>
+                        <div class="meal-item"><strong>Breakfast 2:</strong> Sausage patties</div>
+                        <div class="meal-item"><strong>Lunch 2:</strong> Ground beef patties</div>
+                        <div class="meal-item"><strong>Dinner 2:</strong> Lamb ribs</div>
+                        <div class="meal-item"><strong>Snack 2:</strong> Cheese slices</div>
+                        <div class="meal-item"><strong>Side 2:</strong> Scrambled eggs with butter</div>
+                        <div class="meal-item"><strong>Breakfast 3:</strong> Fried eggs with ham</div>
+                        <div class="meal-item"><strong>Lunch 3:</strong> Chicken thighs with skin</div>
+                        <div class="meal-item"><strong>Dinner 3:</strong> Beef liver with bacon</div>
+                        <div class="meal-item"><strong>Snack 3:</strong> Salami slices</div>
+                    `;
+                    break;
+                case 'keto':
+                    mealSuggestions = `
+                        <div class="meal-item"><strong>Breakfast:</strong> Keto coffee and cheese omelette</div>
+                        <div class="meal-item"><strong>Snack:</strong> Macadamia nuts</div>
+                        <div class="meal-item"><strong>Lunch:</strong> Avocado stuffed with tuna</div>
+                        <div class="meal-item"><strong>Snack:</strong> Pork rinds with cream cheese</div>
+                        <div class="meal-item"><strong>Dinner:</strong> Salmon with butter sauce</div>
+                        <div class="meal-item"><strong>Side:</strong> Sautéed spinach with garlic</div>
+                        <div class="meal-item"><strong>Breakfast 2:</strong> Bacon and egg muffins</div>
+                        <div class="meal-item"><strong>Lunch 2:</strong> Cobb salad with ranch</div>
+                        <div class="meal-item"><strong>Dinner 2:</strong> Beef ribeye with broccoli</div>
+                        <div class="meal-item"><strong>Snack 2:</strong> Olives and cheese cubes</div>
+                        <div class="meal-item"><strong>Side 2:</strong> Zucchini noodles with butter</div>
+                        <div class="meal-item"><strong>Breakfast 3:</strong> Chia pudding with cream</div>
+                        <div class="meal-item"><strong>Lunch 3:</strong> Chicken with pesto sauce</div>
+                        <div class="meal-item"><strong>Dinner 3:</strong> Pork belly with cauliflower mash</div>
+                        <div class="meal-item"><strong>Snack 3:</strong> Almond butter fat bombs</div>
+                    `;
+                    break;
+                case 'vegan':
+                    mealSuggestions = `
+                        <div class="meal-item"><strong>Breakfast:</strong> Oatmeal with berries and chia</div>
+                        <div class="meal-item"><strong>Snack:</strong> Hummus with carrots</div>
+                        <div class="meal-item"><strong>Lunch:</strong> Lentil soup with spinach</div>
+                        <div class="meal-item"><strong>Snack:</strong> Roasted chickpeas</div>
+                        <div class="meal-item"><strong>Dinner:</strong> Tofu stir-fry with veggies</div>
+                        <div class="meal-item"><strong>Side:</strong> Quinoa salad with herbs</div>
+                        <div class="meal-item"><strong>Breakfast 2:</strong> Avocado toast on whole grain</div>
+                        <div class="meal-item"><strong>Lunch 2:</strong> Black bean burrito bowl</div>
+                        <div class="meal-item"><strong>Dinner 2:</strong> Tempeh with roasted sweet potato</div>
+                        <div class="meal-item"><strong>Snack 2:</strong> Almonds and dried apricots</div>
+                        <div class="meal-item"><strong>Side 2:</strong> Kale chips with nutritional yeast</div>
+                        <div class="meal-item"><strong>Breakfast 3:</strong> Smoothie with spinach and peanut butter</div>
+                        <div class="meal-item"><strong>Lunch 3:</strong> Chickpea curry with rice</div>
+                        <div class="meal-item"><strong>Dinner 3:</strong> Stuffed bell peppers with lentils</div>
+                        <div class="meal-item"><strong>Snack 3:</strong> Fresh fruit salad</div>
+                    `;
+                    break;
+            }
+
+            let html = `
+                <div class="results-card">
+                    <h3>Maintenance Calories</h3>
+                    <div class="calorie-value">${maintenance}</div>
+                    <p>Daily calories to maintain current weight</p>
+                </div>
+                <div class="section">
+                    <h3>Weight Loss Options</h3>
+                    <table>
+                        <tr><th>Deficit</th><th>Calories</th><th>Loss Rate</th></tr>
+            `;
+            deficits.forEach(d => {
+                html += `<tr><td>${d.deficit} cal</td><td>${maintenance - d.deficit}</td><td>${d.label}</td></tr>`;
+            });
+            html += `</table></div>`;
+
+            html += `
+                <div class="section">
+                    <h3>${selectedDiet.charAt(0).toUpperCase() + selectedDiet.slice(1)} Food Suggestions</h3>
+                    <div class="meal-suggestions">${mealSuggestions}</div>
+                </div>
+            `;
+
+            document.getElementById('results').innerHTML = html;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
